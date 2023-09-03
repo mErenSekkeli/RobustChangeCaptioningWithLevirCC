@@ -2,6 +2,7 @@
 
 ## Table of Contents
 - [Documentation](#documentation)
+- [Description](#description)
 - [Colab Setup](#colab-setup)
 - [Data](#data)
 - [Data Preprocessing](#data-preprocessing)
@@ -12,6 +13,9 @@
 
 ## Documentation
 You Can find article about this repository [here](https://drive.google.com/file/d/1afR7gHOXX-Hs93__5WEB9LXaJcl3iy0U/view?usp=sharing)
+
+## Description
+This repository contains code and data for a robust change captioning system. It enables the generation of descriptive captions for images with various changes, including semantic changes and distractor images. The system utilizes pre-trained ResNet models for feature extraction and offers tools for data preprocessing, training, testing, and evaluation. Whether you're interested in image captioning or exploring advanced machine learning techniques, this repository provides a robust foundation for your projects.
 
 ## Colab Setup
 1. You can access all project files [here](https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR).
