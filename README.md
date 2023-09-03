@@ -1,7 +1,7 @@
 # Robust Change Captioning Repository
 
 ## Table of Contents
--[Documentation](#documentation)
+- [Documentation](#documentation)
 - [Colab Setup](#colab-setup)
 - [Data](#data)
 - [Data Preprocessing](#data-preprocessing)
