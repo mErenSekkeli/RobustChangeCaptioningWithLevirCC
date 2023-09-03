@@ -1,74 +1,124 @@
-# Robust Change Captioning Reposunun içeriği aşağıdaki makale için kod ve veri içermektedir:
+![image](https://github.com/mErenSekkeli/RobustChangeCaptioningWithLevirCC/assets/100779989/2a383168-4783-4546-a429-2bb9d29663c2)# Robust Change Captioning Repository
 
-## Colab İçin Gerekli Adımlar
-1. Buradan tüm projenin dosyalarına erişilebilir: https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR
-2. Buradan da projenin çalıştırılması için gerekli adımlar sırasıyla verilmiştir:https://colab.research.google.com/drive/1jPJVQsbgasoGfK3c_CIG3qY-XQuYN-tj?usp=sharing
-3. Projeyi ayağa kaldırmak ve özellikle extract_features, train ve test aşamaları için en az Tesla T4 gereklidir.
+## Table of Contents
+- [Colab Setup](#colab-setup)
+- [Data](#data)
+- [Data Preprocessing](#data-preprocessing)
+- [Training](#training)
+- [Testing](#testing)
+- [Evaluation](#evaluation)
+- [Our Results](#our-results)
+
+## Colab Setup
+1. You can access all project files [here](https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR).
+2. Follow these steps to run the project on Colab: [Colab Setup](https://colab.research.google.com/drive/1jPJVQsbgasoGfK3c_CIG3qY-XQuYN-tj?usp=sharing).
+3. To run the project, especially for the extract_features, train, and test phases, you'll need at least a Tesla T4.
 
 ## Data
-1. Buradan tüm Data’yı indirebilirsiniz: https://drive.google.com/drive/folders/1KZ-wtfKwe6QiahSW99TxgNwgCNKDroMV?usp=sharing
+1. Download all data from [this link](https://drive.google.com/drive/folders/1KZ-wtfKwe6QiahSW99TxgNwgCNKDroMV?usp=sharing).
 
-2. İndirdiğiniz data içerisinde 9 adet klasör bulunmaktadır. Bunlar;
-– images –> default images
-– sc_images –> semantically changed images
-– nsc_images –> distractor images
-– features_resnet101 –> default images’ features extracted using ResNet-101
-– sc_features_resnet101 –> semantically changed images’ features extracted using ResNet-101
-– nsc_features_resnet101 –> distractor images’ features extracted using ResNet-101
-– features_resnet50 –> default images’ features extracted using ResNet-50
-– sc_features_resnet50 –> semantically changed images’ features extracted using ResNet-50
-– nsc_features_resnet50 –> distractor images’ features extracted using ResNet-50
+2. The downloaded data includes 9 folders:
+   - `images` -> default images
+   - `sc_images` -> semantically changed images
+   - `nsc_images` -> distractor images
+   - `features_resnet101` -> default images’ features extracted using ResNet-101
+   - `sc_features_resnet101` -> semantically changed images’ features extracted using ResNet-101
+   - `nsc_features_resnet101` -> distractor images’ features extracted using ResNet-101
+   - `features_resnet50` -> default images’ features extracted using ResNet-50
+   - `sc_features_resnet50` -> semantically changed images’ features extracted using ResNet-50
+   - `nsc_features_resnet50` -> distractor images’ features extracted using ResNet-50
 
-3. Preprocess The data
-Preprocess işlemlerinin tamamını yukarıdaki Data linki üzerinden bulabilirsiniz. Ya da ayrıca kendiniz preprocess işlemlerini yapabilirsiniz.
-• Extract visual features using ImageNet pretrained ResNet-101:
-### processing default images
-python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128
+3. Data Preprocessing:
+   - Extract visual features using ImageNet pretrained ResNet-101:
+     ### Processing default images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128
+     ```
 
-### processing semantically changes images
-python scripts/extract_features.py --input_image_dir ./data/sc_images --output_dir ./data/sc_features --batch_size 128
+     ### Processing semantically changed images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/sc_images --output_dir ./data/sc_features --batch_size 128
+     ```
 
-### processing distractor images
-python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128
-• Extract visual features using ImageNet pretrained ResNet-50:
-### processing default images
-python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128 --model resnet50
+     ### Processing distractor images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128
+     ```
 
-### processing semantically changes images
-python scripts/extract_features.py --input_image_dir ./data/sc_images --output_dir ./data/sc_features --batch_size 128 --model resnet50
+   - Extract visual features using ImageNet pretrained ResNet-50:
+     ### Processing default images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128 --model resnet50
+     ```
 
-### processing distractor images
-python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128 --model resnet50
-• Vocab oluşturulamsı ve label’ların çıkarılması için aşağıdaki kodlar çalıştırılmalıdır:
-python scripts/preprocess_captions.py --input_captions_json ./data/change_captions.json --input_neg_captions_json ./data/no_change_captions.json --input_image_dir ./data/images --split_json ./data/splits.json --output_vocab_json ./data/vocab.json --output_h5 ./data/labels.h5
+     ### Processing semantically changed images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/sc_images --output_dir ./data/sc_features --batch_size 128 --model resnet50
+     ```
 
-Train İşlemi
-Modeli eğitmek için aşağıdaki adımlar yapılmalıdır:
-### experiments isminde Tüm çıktıları tutmak için klasör oluşturun.
+     ### Processing distractor images
+     ```shell
+     python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128 --model resnet50
+     ```
+
+4. Creating Vocabulary and Extracting Labels:
+   Run the following code:
+   ```shell
+   python scripts/preprocess_captions.py --input_captions_json ./data/change_captions.json --input_neg_captions_json ./data/no_change_captions.json --input_image_dir ./data/images --split_json ./data/splits.json --output_vocab_json ./data/vocab.json --output_h5 ./data/labels.h5
+
+
+## Training
+To train the model, follow these steps:
+1. Create a folder named 'experiments' to store all outputs:
+```shell
 mkdir experiments
+```
 
-### Tüm loss ve accuracy değerlerini görselleştirmek için visdom server'ı başlatın.
+2. Visualize Loss and Accuracy:
+Start the visdom server to visualize loss and accuracy:
+```shell
 python -m visdom.server
+```
 
-### Traini Başlatmak için aşağıdaki kodu çalıştırın.
-python train.py --cfg configs/dynamic/dynamic.yaml 
-Tüm loss ve accuracy değerlerini görselleştirmek için visdom server’ı başlatın.
+3. Start Training:
+Run the following code:
+```shell
+python train.py --cfg configs/dynamic/dynamic.yaml
+```
+
+4. Visualize Loss and Accuracy (Optional):
+To visualize loss and accuracy, use the following command:
+```shell
 python train.py --cfg configs/dynamic/dynamic.yaml --visualize
-entropy_weight değerini kullanarak dinamik ağırlıkları değiştirilebilir.
+```
+
+5. Modify Dynamic Weights:
+You can modify dynamic weights using the entropy_weight parameter:
+```shell
 python train.py --cfg configs/dynamic/dynamic.yaml --visualize --entropy_weight 0.0001
+```
 
-### Test İşlemi
-Belirli snapshot’u alınmış modeli test etmek için aşağıdaki kodu çalıştırın.
+## Testing
+
+To test a model with a specific snapshot, use the following code:
+
+```shell
 python test.py --cfg configs/dynamic/dynamic.yaml --visualize --snapshot 9000 --gpu 1
-Bu kod, modeli 9000. snapshot’ta test eder. Eğer –snapshot argümanı verilmezse, model en son snapshot’ta test edilir.
+```
+This code tests the model at snapshot 9000. If the --snapshot argument is not provided, the model is tested with the latest snapshot.
 
-### Evaluation
-• Caption evaluation
+## Evaluation
+
+### Caption Evaluation
+
+After formatting the results, run the following code for caption evaluation:
+```shell
 python utils/eval_utils.py
-Format hazırlandıktan sonra aşağıdaki kod çalıştırılmalıdır:
-### This will run evaluation on the results generated from the validation set and print the best results
-python evaluate.py --results_dir ./experiments/dynamic/eval_sents --anno ./data/total_change_captions_reformat.json --type_file ./data/type_mapping.json
-Sonuç bu klasörde gösterilmektedir: ./experiments/dynamic/eval_sents/eval_results.txt
+```
+### Viewing Evaluation Results
+The results will be displayed in this folder: ./experiments/dynamic/eval_sents/eval_results.txt
 
-### Bizim Sonuçlarımız (Our Results)
-Yukarıda verilmiş tüm projenin drive linki olan https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR) linkten tüm sonuçlara erişilebilir. Tüm sonuçların isim kodlaması şu şekildedir: ‘experiments_numberOfExperiment_resnetType_batchSize_batchSizeNumber’ örneğin: experiments_7_resnet50_batchSize_32 –> 7. deneyin sonuçlarıdır. ResNet-50 ile özellikleri çıkarılmış ve batch size 32 ile eğitilmiştir.
+## Our Results
+You can access all results in the [Google Drive link](https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR). All results are named with the following format: 'experiments_numberOfExperiment_resnetType_batchSize_batchSizeNumber,' for example: `experiments_7_resnet50_batchSize_32` represents the results of the 7th experiment, where features were extracted with ResNet-50 and a batch size of 32 was used.
+
+
