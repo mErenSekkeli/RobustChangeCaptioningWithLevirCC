@@ -1,4 +1,4 @@
-![image](https://github.com/mErenSekkeli/RobustChangeCaptioningWithLevirCC/assets/100779989/2a383168-4783-4546-a429-2bb9d29663c2)# Robust Change Captioning Repository
+# Robust Change Captioning Repository
 
 ## Table of Contents
 - [Colab Setup](#colab-setup)
