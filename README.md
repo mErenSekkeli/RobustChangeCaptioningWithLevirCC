@@ -12,7 +12,7 @@
 - [Our Results](#our-results)
 
 ## Documentation
-You Can find article about this repository [here](https://drive.google.com/file/d/1afR7gHOXX-Hs93__5WEB9LXaJcl3iy0U/view?usp=sharing)
+You can find article about this repository [here](https://drive.google.com/file/d/1afR7gHOXX-Hs93__5WEB9LXaJcl3iy0U/view?usp=sharing)
 
 ## Description
 This repository contains code and data for a robust change captioning system. It enables the generation of descriptive captions for images with various changes, including semantic changes and distractor images. The system utilizes pre-trained ResNet models for feature extraction and offers tools for data preprocessing, training, testing, and evaluation. Whether you're interested in image captioning or exploring advanced machine learning techniques, this repository provides a robust foundation for your projects.
