@@ -1,7 +1,8 @@
 import argparse, os, json
 import numpy as np
-from scipy.misc import imread, imresize
-
+from PIL import Image
+from imageio import imread
+from cv2 import resize
 import torch
 import torchvision
 
@@ -10,10 +11,10 @@ parser.add_argument('--input_image_dir', required=True)
 parser.add_argument('--max_images', default=None, type=int)
 parser.add_argument('--output_dir', required=True)
 
-parser.add_argument('--image_height', default=224, type=int)
-parser.add_argument('--image_width', default=224, type=int)
+parser.add_argument('--image_height', default=256, type=int)
+parser.add_argument('--image_width', default=256, type=int)
 
-parser.add_argument('--model', default='resnet101')
+parser.add_argument('--model', default='vgg19')
 parser.add_argument('--model_stage', default=3, type=int)
 parser.add_argument('--batch_size', default=128, type=int)
 
@@ -22,40 +23,34 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
 def build_model(args):
-  if not hasattr(torchvision.models, args.model):
-    raise ValueError('Invalid model "%s"' % args.model)
-  if not 'resnet' in args.model:
-    raise ValueError('Feature extraction only supports ResNets')
-  cnn = getattr(torchvision.models, args.model)(pretrained=True)
-  layers = [
-    cnn.conv1,
-    cnn.bn1,
-    cnn.relu,
-    cnn.maxpool,
-  ]
-  for i in range(args.model_stage):
-    name = 'layer%d' % (i + 1)
-    layers.append(getattr(cnn, name))
-  model = torch.nn.Sequential(*layers)
-  model.to(device)
-  model.eval()
-  return model
-
+    if not hasattr(torchvision.models, args.model):
+        raise ValueError('Invalid model "%s"' % args.model)
+    if not 'vgg' in args.model:
+        raise ValueError('Feature extraction only supports VGG models')
+    cnn = getattr(torchvision.models, args.model)(pretrained=True).features[:args.model_stage]
+    model = torch.nn.Sequential(cnn)
+    model.to(device)
+    model.eval()
+    return model
 
 def run_batch(cur_batch, model):
-  mean = np.array([0.485, 0.456, 0.406]).reshape(1, 3, 1, 1)
-  std = np.array([0.229, 0.224, 0.224]).reshape(1, 3, 1, 1)
+    mean = np.array([0.485, 0.456, 0.406]).reshape(1, 3, 1, 1)
+    std = np.array([0.229, 0.224, 0.224]).reshape(1, 3, 1, 1)
 
-  image_batch = np.concatenate(cur_batch, 0).astype(np.float32)
-  image_batch = (image_batch / 255.0 - mean) / std
-  image_batch = torch.FloatTensor(image_batch).to(device)
+    image_batch = np.concatenate(cur_batch, 0).astype(np.float32)
+    image_batch = (image_batch / 255.0 - mean) / std
+    image_batch = torch.FloatTensor(image_batch).to(device)
 
-  with torch.no_grad():
-      feats = model(image_batch)
-  feats = feats.cpu().clone().numpy()
+    with torch.no_grad():
+        feats = model(image_batch)
 
-  return feats
+    feats = torch.nn.functional.adaptive_avg_pool2d(feats, (64, 64))  # Pooling
 
+    feats = feats.reshape(feats.size(0), -1)  # Flatten the features
+
+    feats = feats.cpu().clone().numpy()
+
+    return feats
 
 def main(args):
   input_paths = []
@@ -84,8 +79,8 @@ def main(args):
   cur_batch = []
   cur_path_batch = []
   for i, (path, idx) in enumerate(input_paths):
-    img = imread(path, mode='RGB')
-    img = imresize(img, img_size, interp='bicubic')
+    img = imread(path, pilmode='RGB')
+    img = resize(img, img_size)
     img = img.transpose(2, 0, 1)[None]
     cur_batch.append(img)
     cur_path_batch.append(path)

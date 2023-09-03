@@ -2,7 +2,6 @@ import os
 import json
 import numpy as np
 import random
-import time
 
 import h5py
 import torch
@@ -10,17 +9,6 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataloader import default_collate
 
 class RCCDataset(Dataset):
-
-    shapes = set(['ball', 'block', 'cube', 'cylinder', 'sphere'])
-    sphere = set(['ball', 'sphere'])
-    cube = set(['block', 'cube'])
-    cylinder = set(['cylinder'])
-
-    colors = set(['red', 'cyan', 'brown', 'blue', 'purple', 'green', 'gray', 'yellow'])
-
-    materials = set(['metallic', 'matte', 'rubber', 'shiny', 'metal'])
-    rubber = set(['matte', 'rubber'])
-    metal = set(['metal', 'metallic', 'shiny'])
 
     type_to_label = {
         'color': 0,
@@ -91,7 +79,7 @@ class RCCDataset(Dataset):
             self.split_idxs = self.splits['test']
             self.num_samples = len(self.split_idxs)
             if cfg.data.test.max_samples is not None:
-                self.num_samples = min(max_samples, self.num_samples)
+                self.num_samples = min(cfg.data.test.max_samples, self.num_samples)
         else:
             raise Exception('Unknown data split %s' % split)
 
@@ -116,7 +104,7 @@ class RCCDataset(Dataset):
     def __getitem__(self, index):
         random.seed()
         img_idx = self.split_idxs[index]
-
+        
         # Fetch image data
         # one easy way to augment data is to use nonsemantically changed
         # scene as the default :)

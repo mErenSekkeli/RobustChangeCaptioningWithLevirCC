@@ -3,7 +3,7 @@ import argparse
 import json
 import numpy as np
 
-from scipy.misc import imresize
+from cv2 import resize
 
 from utils.eval_utils import pointing
 from collections import OrderedDict
@@ -79,8 +79,8 @@ for res in results:
             gt_bbox_after = create_anno_from_bbox(gt_bbox_after, IMAGE_SIZE)
         gen_map_before = np.load(os.path.join(gen_map_dir, '%06d_before.npy' % int(image_id)))
         gen_map_after = np.load(os.path.join(gen_map_dir, '%06d_after.npy' % int(image_id)))
-        gen_map_before = imresize(np.squeeze(gen_map_before), IMAGE_SIZE, mode='F')
-        gen_map_after = imresize(np.squeeze(gen_map_after), IMAGE_SIZE, mode='F')
+        gen_map_before = resize(np.squeeze(gen_map_before), IMAGE_SIZE, mode='F')
+        gen_map_after = resize(np.squeeze(gen_map_after), IMAGE_SIZE, mode='F')
         gt_mapping[image_id] = (gt_bbox_before, gt_bbox_after)
         gen_mapping[image_id] = (gen_map_before, gen_map_after)
 

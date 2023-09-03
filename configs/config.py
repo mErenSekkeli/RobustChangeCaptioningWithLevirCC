@@ -76,7 +76,7 @@ __C.model.speaker.start_from = 'None'
 __C.data = AttrDict()
 
 __C.data.dataset = 'rcc_dataset'
-__C.data.num_workers = 8
+__C.data.num_workers = 0
 __C.data.default_feature_dir = './data/features'
 __C.data.semantic_feature_dir = './data/sc_features'
 __C.data.nonsemantic_feature_dir = './data/nsc_features'
@@ -87,7 +87,7 @@ __C.data.vocab_json = './data/vocab.json'
 __C.data.splits_json = './data/splits.json'
 __C.data.h5_label_file = './data/labels.h5'
 __C.data.h5_ref_label_file = './data/ref_labels.h5'
-__C.data.type_mapping_json = './data/type_mapping_v2.json'
+__C.data.type_mapping_json = './data/type_mapping.json'
 
 __C.data.train = AttrDict()
 __C.data.train.batch_size = 128
@@ -109,9 +109,9 @@ __C.data.test.max_samples = None
 # --------------------------------------------------------------------------- #
 __C.train = AttrDict()
 
-__C.train.snapshot_interval = 1000
+__C.train.snapshot_interval = 25
 __C.train.start_from = None
-__C.train.max_iter = 10000
+__C.train.max_iter = 25
 __C.train.log_interval = 50
 __C.train.scheduled_sampling_start = 1000000
 __C.train.scheduled_sampling_increase_every = 5
@@ -141,7 +141,7 @@ __C.train.keep_rate = 0.95
 def merge_cfg_from_file(cfg_filename):
     """Load a yaml config file and merge it into the global config."""
     with open(cfg_filename, 'r') as f:
-        yaml_cfg = AttrDict(yaml.load(f))
+        yaml_cfg = AttrDict(yaml.load(f, Loader=yaml.FullLoader))
     _merge_a_into_b(yaml_cfg, __C)
 
 

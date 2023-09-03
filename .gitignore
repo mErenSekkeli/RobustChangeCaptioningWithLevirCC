@@ -19,6 +19,12 @@ lib64/
 parts/
 sdist/
 var/
+data/
+data_2/
+env/
+experiments/
+rcc/
+levirCC/
 wheels/
 *.egg-info/
 .installed.cfg

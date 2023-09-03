@@ -1,4 +1,5 @@
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import sys
 import json
 import argparse
@@ -179,7 +180,6 @@ while t < cfg.train.max_iter:
         total_loss_avg.update(total_loss_val, 2 * batch_size)
 
         stats = {}
-        stats['entropy_loss'] = entropy_loss.item()
         stats['speaker_loss'] = speaker_loss_val
         stats['avg_speaker_loss'] = speaker_loss_avg.avg
         stats['total_loss'] = total_loss_val

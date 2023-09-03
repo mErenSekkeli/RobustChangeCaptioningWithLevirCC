@@ -1,5 +1,5 @@
 import sys
-COCO_PATH = 'PATH_TO_COCO_EVAL' # i.e. /home/user/code/coco-caption
+COCO_PATH = '\\..\\COCO\\coco-caption' # i.e. /home/user/code/coco-caption
 sys.path.insert(0, COCO_PATH)
 
 import json
@@ -13,12 +13,12 @@ def coco_gt_format_save(gt_file, neg=False):
     gt = json.load(open(gt_file, 'r'))
     gt_dict = {}
     info_dict = {
-        'contributor': 'dummy',
-        'date_created': 'dummy',
-        'description': 'dummy',
-        'url': 'dummy',
-        'version': 'dummy',
-        'year': 'dummy'
+        'contributor': 'mErenSekkeli',
+        'date_created': '29.04.2023',
+        'description': 'Robust Captioning',
+        'url': 'https://github.com/Seth-Park/RobustChangeCaptioning',
+        'version': '1.0',
+        'year': '29.04.2023'
     }
 
     gt_dict['info'] = info_dict
@@ -57,12 +57,12 @@ def merge_gt_files(gt_file1, gt_file2, save_path):
     gt2 = json.load(open(gt_file2, 'r'))
     gt_dict = {}
     info_dict = {
-        'contributor': 'dummy',
-        'date_created': 'dummy',
-        'description': 'dummy',
-        'url': 'dummy',
-        'version': 'dummy',
-        'year': 'dummy'
+        'contributor': 'mErenSekkeli',
+        'date_created': '29.04.2023',
+        'description': 'Robust Captioning',
+        'url': 'https://github.com/Seth-Park/RobustChangeCaptioning',
+        'version': '1.0',
+        'year': '29.04.2023'
     }
 
     gt_dict['info'] = info_dict

@@ -9,6 +9,7 @@ from torch.nn.utils.rnn import PackedSequence, pack_padded_sequence, pad_packed_
 
 from .CaptionModel import CaptionModel
 
+from functools import reduce
 
 def sort_pack_padded_sequence(input, lengths):
     sorted_lengths, indices = torch.sort(lengths, descending=True)

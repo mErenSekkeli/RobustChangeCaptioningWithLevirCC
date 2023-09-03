@@ -4,11 +4,11 @@ logger:
     display_id: 9908
 model:
     change_detector:
-        input_dim: 2048 + 4
+        input_dim: 2052
     speaker:
         embed_input_dim: 3078
         embed_dim: 512
-        input_dim: 1024 + 2
+        input_dim: 1026
         vocab_size: 76
         seq_length: 23
 
@@ -20,7 +20,7 @@ data:
     train:
         batch_size: 128
 train:
-    max_iter: 10000
+    max_iter: 25
     optim:
         type: 'adam'
         lr: 0.001

@@ -207,6 +207,7 @@ class LanguageModelCriterion(nn.Module):
 
     def forward(self, input, target, mask, emphasize_last=False):
         # truncate to the same size
+        target = target.long()
         target = target[:, :input.size(1)]
         mask =  mask[:, :input.size(1)]
 
