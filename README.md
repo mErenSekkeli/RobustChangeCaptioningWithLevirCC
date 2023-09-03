@@ -1,35 +1,27 @@
-# Robust Change Captioning
-This repository contains the code and dataset for the following paper:
+# Robust Change Captioning Reposunun içeriği aşağıdaki makale için kod ve veri içermektedir:
 
-* DH. Park, T. Darrell, A. Rohrbach, *Robust Change Captioning.* in ICCV 2019. ([arXiv](https://arxiv.org/abs/1901.02527))
-
-## Installation
-1. Clone the repository (`git clone git@github.com:Seth-Park/RobustChangeCaptioning.git`)
-2. `cd RobustChangeCaptioning`
-3. Make virtual environment with Python 3.5 (`mkvirtualenv rcc -p python3.5`)
-4. Install requirements (`pip install -r requirements.txt`)
-5. Setup COCO caption eval tools ([github](https://github.com/tylin/coco-caption)) (Since the repo only supports Python 2.7, either create a separate virtual environment with Python 2.7 or modify the code to be compatible with Python 3.5).
+## Colab İçin Gerekli Adımlar
+1. Buradan tüm projenin dosyalarına erişilebilir: https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR
+2. Buradan da projenin çalıştırılması için gerekli adımlar sırasıyla verilmiştir:https://colab.research.google.com/drive/1jPJVQsbgasoGfK3c_CIG3qY-XQuYN-tj?usp=sharing
+3. Projeyi ayağa kaldırmak ve özellikle extract_features, train ve test aşamaları için en az Tesla T4 gereklidir.
 
 ## Data
-1. Download data from here: [google drive link](https://drive.google.com/file/d/1HJ3gWjaUJykEckyb2M0MB4HnrJSihjVe/view?usp=sharing)
-```
-python google_drive.py 1HJ3gWjaUJykEckyb2M0MB4HnrJSihjVe clevr_change.tar.gz
-tar -xzvf clevr_change.tar.gz
-```
-Extracting this file will create `data` directory and fill it up with CLEVR-Change dataset.
+1. Buradan tüm Data’yı indirebilirsiniz: https://drive.google.com/drive/folders/1KZ-wtfKwe6QiahSW99TxgNwgCNKDroMV?usp=sharing
 
-2. Preprocess data
+2. İndirdiğiniz data içerisinde 9 adet klasör bulunmaktadır. Bunlar;
+– images –> default images
+– sc_images –> semantically changed images
+– nsc_images –> distractor images
+– features_resnet101 –> default images’ features extracted using ResNet-101
+– sc_features_resnet101 –> semantically changed images’ features extracted using ResNet-101
+– nsc_features_resnet101 –> distractor images’ features extracted using ResNet-101
+– features_resnet50 –> default images’ features extracted using ResNet-50
+– sc_features_resnet50 –> semantically changed images’ features extracted using ResNet-50
+– nsc_features_resnet50 –> distractor images’ features extracted using ResNet-50
 
-We are providing the preprocessed data here: [google drive link](https://drive.google.com/file/d/1FA9mYGIoQ_DvprP6rtdEve921UXewSGF/view?usp=sharing).
-You can skip the procedures explained below and just download them using the following command:
-```
-python google_drive.py 1FA9mYGIoQ_DvprP6rtdEve921UXewSGF ./data/clevr_change_features.tar.gz
-cd data
-tar -xzvf clevr_change_features.tar.gz
-```
-
-* Extract visual features using ImageNet pretrained ResNet-101:
-```
+3. Preprocess The data
+Preprocess işlemlerinin tamamını yukarıdaki Data linki üzerinden bulabilirsiniz. Ya da ayrıca kendiniz preprocess işlemlerini yapabilirsiniz.
+• Extract visual features using ImageNet pretrained ResNet-101:
 # processing default images
 python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128
 
@@ -38,89 +30,45 @@ python scripts/extract_features.py --input_image_dir ./data/sc_images --output_d
 
 # processing distractor images
 python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128
-```
+• Extract visual features using ImageNet pretrained ResNet-50:
+# processing default images
+python scripts/extract_features.py --input_image_dir ./data/images --output_dir ./data/features --batch_size 128 --model resnet50
 
-* Build vocab and label files using caption annotations:
-```
+# processing semantically changes images
+python scripts/extract_features.py --input_image_dir ./data/sc_images --output_dir ./data/sc_features --batch_size 128 --model resnet50
+
+# processing distractor images
+python scripts/extract_features.py --input_image_dir ./data/nsc_images --output_dir ./data/nsc_features --batch_size 128 --model resnet50
+• Vocab oluşturulamsı ve label’ların çıkarılması için aşağıdaki kodlar çalıştırılmalıdır:
 python scripts/preprocess_captions.py --input_captions_json ./data/change_captions.json --input_neg_captions_json ./data/no_change_captions.json --input_image_dir ./data/images --split_json ./data/splits.json --output_vocab_json ./data/vocab.json --output_h5 ./data/labels.h5
-```
 
-## Training
-To train the Dual Dynamic Attention Model (DUDA), run the following commands:
-```
-# create a directory or a symlink to save the experiments logs/snapshots etc.
+Train İşlemi
+Modeli eğitmek için aşağıdaki adımlar yapılmalıdır:
+# experiments isminde Tüm çıktıları tutmak için klasör oluşturun.
 mkdir experiments
-# OR
-ln -s $PATH_TO_DIR$ experiments
 
-# this will start the visdom server for logging
-# start the server on a tmux session since the server needs to be up during training
+# Tüm loss ve accuracy değerlerini görselleştirmek için visdom server'ı başlatın.
 python -m visdom.server
 
-# start training
+# Traini Başlatmak için aşağıdaki kodu çalıştırın.
 python train.py --cfg configs/dynamic/dynamic.yaml 
-```
-
-The training script runs the model on the validation dataset every snapshot iteration and one can save the visualizations of dual attentions and dynamic attentions using the flag `visualize`:
-```
+Tüm loss ve accuracy değerlerini görselleştirmek için visdom server’ı başlatın.
 python train.py --cfg configs/dynamic/dynamic.yaml --visualize
-```
-
-One can also control the strength of entropy regularization over the dynamic attention weights using the flag `entropy_weight`:
-```
+entropy_weight değerini kullanarak dinamik ağırlıkları değiştirilebilir.
 python train.py --cfg configs/dynamic/dynamic.yaml --visualize --entropy_weight 0.0001
-```
 
-## Testing/Inference
-To test/run inference on the test dataset, run the following command
-```
+Test İşlemi
+Belirli snapshot’u alınmış modeli test etmek için aşağıdaki kodu çalıştırın.
 python test.py --cfg configs/dynamic/dynamic.yaml --visualize --snapshot 9000 --gpu 1
-```
-The command above will take the model snapshot at 9000th iteration and run inference using GPU ID 1, saving visualizations as well.
+Bu kod, modeli 9000. snapshot’ta test eder. Eğer –snapshot argümanı verilmezse, model en son snapshot’ta test edilir.
 
-## Evaluation
-* Caption evaluation
-
-To evaluate captions, we need to first reformat the caption annotations into COCO eval tool format (only need to run this once). After setting up the COCO caption eval tools ([github](https://github.com/tylin/coco-caption)), make sure to modify `utils/eval_utils.py` so that the `COCO_PATH` variable points to the COCO eval tool repository. Then, run the following command:
-```
+Evaluation
+• Caption evaluation
 python utils/eval_utils.py
-```
-
-After the format is ready, run the following command to run evaluation:
-```
+Format hazırlandıktan sonra aşağıdaki kod çalıştırılmalıdır:
 # This will run evaluation on the results generated from the validation set and print the best results
 python evaluate.py --results_dir ./experiments/dynamic/eval_sents --anno ./data/total_change_captions_reformat.json --type_file ./data/type_mapping.json
-```
+Sonuç bu klasörde gösterilmektedir: ./experiments/dynamic/eval_sents/eval_results.txt
 
-Once the best model is found on the validation set, you can run inference on test set for that specific model using the command exlpained in the `Testing/Inference` section and then finally evaluate on test set:
-```
-python evaluate.py --results_dir ./experiments/dynamic/test_output/captions --anno ./data/total_change_captions_reformat.json --type_file ./data/type_mapping.json
-```
-The results are saved in `./experiments/dynamic/test_output/captions/eval_results.txt`
-
-To evaluate based on IOUs, run the following command:
-```
-python evaluate_by_IOU.py --results_dir ./experiments/dynamic/test_output/captions --anno ./data/total_change_captions_reformat.json --type_file ./data/type_mapping.json --IOU_file ./data/change_captions_by_IOU.json
-```
-By default, this command will compute captioning scores on the top 25% difficult examples based on IOU. However, you can change the percentage or compute for easiest examples by modifying `evalaute_by_IOU.py`
-
-* Pointing Game evaluation
-
-Run the following command to run Pointing Game evaluation:
-```
-python evaluate_pointing.py --results_dir ./experiments/dynamic/test_output/attentions --anno ./data/change_captions_with_bbox.json --type_file ./data/type_mapping.json
-```
-The results are saved in `./experiments/dynamic/test_output/attentions/eval_results_pointing.txt`
-
-You can also run Pointing Game evaluation by IOU:
-```
-python evaluate_pointing_by_IOU.py --results_dir ./experiments/dynamic/test_output/attentions --anno ./data/change_captions_with_bbox.json --type_file ./data/type_mapping.json --IOU_file ./data/change_captions_by_IOU.json
-```
-
-## Pretrained Model
-We provide weights, training log, generated dual attention maps and captions here: [google drive link](https://drive.google.com/file/d/1DloxAUV19_WwUIeWPQDcHEGvGrW65Pu6/view?usp=sharing). You can download them using this command:
-```
-python google_drive.py 1DloxAUV19_WwUIeWPQDcHEGvGrW65Pu6 ./experiments/pretrained_DUDA.tar.gz
-cd experiments
-tar -xzvf pretrained_DUDA.tar.gz
-```
+Bizim Sonuçlarımız
+Yukarıda verilmiş tüm projenin drive linki olan https://drive.google.com/drive/folders/1HgLErwlXiNE0L3IAc3_4CQH6HYizLUVR) linkten tüm sonuçlara erişilebilir. Tüm sonuçların isim kodlaması şu şekildedir: ‘experiments_numberOfExperiment_resnetType_batchSize_batchSizeNumber’ örneğin: experiments_7_resnet50_batchSize_32 –> 7. deneyin sonuçlarıdır. ResNet-50 ile özellikleri çıkarılmış ve batch size 32 ile eğitilmiştir.
