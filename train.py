@@ -96,7 +96,7 @@ val_dataset, val_loader = create_dataset(cfg, 'val')
 train_size = len(train_dataset)
 val_size = len(val_dataset)
 
-# Define loss function and optimizer
+# Define optimizer and loss function
 lang_criterion = LanguageModelCriterion().to(device)
 entropy_criterion = EntropyLoss().to(device)
 all_params = list(change_detector.parameters()) + list(speaker.parameters())
